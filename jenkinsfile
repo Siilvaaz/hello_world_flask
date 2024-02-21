@@ -2,7 +2,11 @@ node {
     stage('Install dependencies') {
         sh """
         pwd
-        pyenv install 3.10.0
+        sudo apt update && sudo apt upgrade
+        sudo add-apt-repository ppa:deadsnakes/ppa -y
+        sudo apt update
+        sudo apt install python3.10
+        python3.10 --version
         pip3.10 install google-cloud-pubsub
         pip3.10 install google-cloud-storage
         pip3.10 install google-api-core
