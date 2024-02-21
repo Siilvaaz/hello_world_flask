@@ -2,7 +2,7 @@ node {
     stage('Install dependencies') {
         sh """
         pwd
-        sudo apt install python3-pip
+        sudo visudo apt install python3-pip
         pip3.10 install google-cloud-pubsub
         pip3.10 install google-cloud-storage
         pip3.10 install google-api-core
