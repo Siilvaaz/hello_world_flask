@@ -1,6 +1,7 @@
 from google.cloud import pubsub_v1
 import json
 import sys
+from datetime import datetime
 
 def receive_messages(project_id, subscription_id, output_file):
     subscriber = pubsub_v1.SubscriberClient()
@@ -12,7 +13,7 @@ def receive_messages(project_id, subscription_id, output_file):
                 "message_id": message.message_id,
                 "data": message.data.decode('utf-8'),
                 "attributes": dict(message.attributes),
-                "publish_time": message.publish_time,
+                "publish_time": message.publish_time.isoformat(),  # Convert datetime to string
             }
             json.dump(data, f, indent=2)
 
