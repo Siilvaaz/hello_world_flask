@@ -1,27 +1,20 @@
+# Get_Payload.py
+
+import os
 from google.cloud import storage
 
-# Define your GCS bucket name
-bucket_name = "pocjenkins"
-
-# Define the names of the input and expected output payload files
-input_payload_file = "input.json"
-expected_output_payload_file = "expected_output.json"
-
-# Define the local directory where you want to store the payload files
-local_directory = ""
-
-# Function to download a file from GCS
-def download_file_from_gcs(source_blob_name, destination_file_name):
-    """Downloads a file from the bucket."""
-    storage_client = storage.Client()
+def download_payload(project_id, bucket_name, source_blob_name, destination_file_name):
+    storage_client = storage.Client(project=project_id)
     bucket = storage_client.bucket(bucket_name)
     blob = bucket.blob(source_blob_name)
     blob.download_to_filename(destination_file_name)
-    print(f"File {source_blob_name} downloaded to {destination_file_name}.")
 
-if __name__ == "__main__":
-    # Download the input payload file from GCS
-    download_file_from_gcs(input_payload_file, local_directory + input_payload_file)
+def main(project_id, bucket_name, source_blob_name, destination_file_name):
+    download_payload(project_id, bucket_name, source_blob_name, destination_file_name)
 
-    # Download the expected output payload file from GCS
-    download_file_from_gcs(expected_output_payload_file, local_directory + expected_output_payload_file)
+if __name__ == '__main__':
+    project_id = 'sandbox-anthos'
+    bucket_name = 'pocjenkins'
+    source_blob_name = 'input.json'
+    destination_file_name = 'input.json'
+    main(project_id, bucket_name, source_blob_name, destination_file_name)
