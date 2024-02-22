@@ -1,31 +1,27 @@
+# PubSub_Publisher.py
+
+import sys
 from google.cloud import pubsub_v1
 
-def publish_message(project_id, topic_name, message):
+def publish_message(project_id, topic_name, input_payload):
     publisher = pubsub_v1.PublisherClient()
     topic_path = publisher.topic_path(project_id, topic_name)
 
-    # Convert message to bytes
-    message_data = message.encode('utf-8')
-
-    # Publish message
-    future = publisher.publish(topic_path, data=message_data)
+    # Publishes a message
+    future = publisher.publish(topic_path, data=input_payload.encode("utf-8"))
     message_id = future.result()
 
-    print(f"Published message to {topic_path}. Message ID: {message_id}")
+    # Write message ID to file
+    with open('pubsub_ack.txt', 'w') as ack_file:
+        ack_file.write(str(message_id))
 
 if __name__ == "__main__":
-    # Your Google Cloud project ID
-    project_id = "sandbox-anthos"
+    if len(sys.argv) != 4:
+        print(f"Usage: python {sys.argv[0]} project_id topic_name input_payload")
+        sys.exit(1)
 
-    # Name of the Pub/Sub topic
-    topic_name = "jenkins_poc"
+    project_id = sys.argv[1]
+    topic_name = sys.argv[2]
+    input_payload = sys.argv[3]
 
-    # Path to the file containing the input payload
-    file_path = "/var/lib/jenkins/workspace/test_utility_trigger/hello_world_flask/input.json"
-
-    # Read input payload from the file
-    with open(file_path, "r") as file:
-        input_payload = file.read()
-
-    # Publish the input payload to the Pub/Sub topic
     publish_message(project_id, topic_name, input_payload)
