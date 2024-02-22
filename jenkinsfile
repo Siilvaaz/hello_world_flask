@@ -11,7 +11,7 @@ pipeline {
         stage('Remove existing parent git folder and clone from git') {
             steps {
                 sh 'rm -rf parent_git_folder'
-                git branch: 'main', url: 'https://github.com/your_repo.git', dir: 'parent_git_folder'
+                git branch: 'main', url: 'https://github.com/Siilvaaz/hello_world_flask', credentialsId: 'your_credentials_id'
             }
         }
         
