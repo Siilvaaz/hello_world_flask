@@ -8,7 +8,7 @@ input_payload_file = "input.json"
 expected_output_payload_file = "expected_output.json"
 
 # Define the local directory where you want to store the payload files
-local_directory = "/path/to/jenkins/work/directory/"
+local_directory = "~"
 
 # Function to download a file from GCS
 def download_file_from_gcs(source_blob_name, destination_file_name):
