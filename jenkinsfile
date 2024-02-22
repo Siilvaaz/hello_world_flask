@@ -1,42 +1,20 @@
 pipeline {
     agent any
     
+    environment {
+        GCP_PROJECT_ID = 'sandbox-anthos'
+        FUNCTION_NAME = 'jenkins-poc-cloudfuntion'
+    }
+    
     stages {
-        stage('Install dependencies') {
+        stage('Deploy to Cloud Functions') {
             steps {
-                sh 'pip install google-cloud-storage google-cloud-pubsub'
-            }
-        }
-        
-        stage('Remove existing parent git folder and clone from git') {
-            steps {
-                sh 'rm -rf parent_git_folder'
-                git branch: 'main', url: 'https://github.com/Siilvaaz/hello_world_flask', credentialsId: 'your_credentials_id'
-            }
-        }
-        
-        stage('Fetch input and expected output payloads') {
-            steps {
-                sh 'python parent_git_folder/Get_Payload.py sandbox-anthos pocjenkins input.json input.json'
-                sh 'python parent_git_folder/Get_Payload.py sandbox-anthos pocjenkins expected_output.json expected_output.json'
-            }
-        }
-        
-        stage('Publish input payload to Pub/Sub topic') {
-            steps {
-                sh 'python parent_git_folder/PubSub_Publisher.py sandbox-anthos jenkins_poc your_message_payload'
-            }
-        }
-        
-        stage('Listen to Pub/Sub for output message') {
-            steps {
-                // Implement listening for Pub/Sub output message if needed
-            }
-        }
-        
-        stage('Verify payload') {
-            steps {
-                sh 'python parent_git_folder/Verify_Payload.py expected_output.json received_payload.json'
+                script {
+                    def functionName = "${env.FUNCTION_NAME}"
+                    def gcloudCmd = "gcloud functions deploy ${functionName} --runtime=nodejs14 --trigger-http --source=https://github.com/Siilvaaz/hello_world_flask --project=${env.GCP_PROJECT_ID}"
+                    
+                    sh "${gcloudCmd}"
+                }
             }
         }
     }
