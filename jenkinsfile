@@ -1,60 +1,43 @@
-node {
-    stage('Install dependencies') {
-        sh """
-        pwd
-        sudo apt install -y python3-pip
-        pip3 install google-cloud-pubsub
-        pip3 install google-cloud-storage
-        pip3 install google-api-core
-        pip3 install google-cloud-bigquery
-        pip3 install pybase64
-        """
-    }
-    stage('Git Clone') {
-        sh """
-        pwd
-        rm -rf hello_world_flask
-        git clone https://github.com/Siilvaaz/hello_world_flask -b main
-        ls -lart
-        """
-    }
-    stage('Get Input from GCS') {
-        sh """
-        pwd
-        cd hello_world_flask
-        python3 Get_Payload.py sandbox-anthos hello_world_flask pocjenkins input.json
-        """
-    }
-    stage('Get Expected Output payload from GCS') {
-        sh """
-        pwd
-        cd hello_world_flask
-        python3 Get_Payload.py sandbox-anthos hello_world_flask pocjenkins expected_output.json
-        """
-    }
-    stage('Publish to PubSub') {
-        sh """
-        pwd
-        cd hello_world_flask
-        python3 PubSub_Publisher.py sandbox-anthos jenkins_poc input.json
-        ls -l
-        echo "### pubsub message id ###"
-        cat pubsub_ack.txt
-        """
-    }
-    stage('Listen to PubSub') {
-        sh """
-        pwd
-        cd hello_world_flask
-        python3 PubSub_Listener.py sandbox-anthos jenkins_poc-sub received_payload.json
-        ls -l
-        """
-    }
-    stage('Compare Payloads') {
-        sh """
-        pwd
-        cd hello_world_flask
-        python3 Verify_Payload.py sandbox-anthos expected_output.json received_payload.json
-        """
+pipeline {
+    agent any
+    
+    stages {
+        stage('Install dependencies') {
+            steps {
+                sh 'pip install google-cloud-storage google-cloud-pubsub'
+            }
+        }
+        
+        stage('Remove existing parent git folder and clone from git') {
+            steps {
+                sh 'rm -rf parent_git_folder'
+                git branch: 'main', url: 'https://github.com/your_repo.git', dir: 'parent_git_folder'
+            }
+        }
+        
+        stage('Fetch input and expected output payloads') {
+            steps {
+                sh 'python parent_git_folder/Get_Payload.py sandbox-anthos pocjenkins input.json input.json'
+                sh 'python parent_git_folder/Get_Payload.py sandbox-anthos pocjenkins expected_output.json expected_output.json'
+            }
+        }
+        
+        stage('Publish input payload to Pub/Sub topic') {
+            steps {
+                sh 'python parent_git_folder/PubSub_Publisher.py sandbox-anthos jenkins_poc your_message_payload'
+            }
+        }
+        
+        stage('Listen to Pub/Sub for output message') {
+            steps {
+                // Implement listening for Pub/Sub output message if needed
+            }
+        }
+        
+        stage('Verify payload') {
+            steps {
+                sh 'python parent_git_folder/Verify_Payload.py expected_output.json received_payload.json'
+            }
+        }
     }
 }
