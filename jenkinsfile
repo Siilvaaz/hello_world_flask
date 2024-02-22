@@ -36,7 +36,7 @@ node {
         sh """
         pwd
         cd hello_world_flask
-        python3 PubSub_Publisher.py sandbox-anthos input_pubsub_topic input.json
+        python3 PubSub_Publisher.py sandbox-anthos jenkins_poc input.json
         ls -l
         echo "### pubsub message id ###"
         cat pubsub_ack.txt
@@ -46,7 +46,7 @@ node {
         sh """
         pwd
         cd hello_world_flask
-        python3 PubSub_Listener.py sandbox-anthos output_pubsub_topic-sub received_payload.json
+        python3 PubSub_Listener.py sandbox-anthos jenkins_poc-sub received_payload.json
         ls -l
         """
     }
