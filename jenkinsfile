@@ -22,14 +22,14 @@ node {
         sh """
         pwd
         cd hello_world_flask
-        python3 Get_Payload.py sandbox-anthos payload_repository gcs_folder input.json
+        python3 Get_Payload.py sandbox-anthos payload_repository pocjenkins input.json
         """
     }
     stage('Get Expected Output payload from GCS') {
         sh """
         pwd
         cd hello_world_flask
-        python3 Get_Payload.py sandbox-anthos payload_repository gcs_folder expected_output.json
+        python3 Get_Payload.py sandbox-anthos payload_repository pocjenkins expected_output.json
         """
     }
     stage('Publish to PubSub') {
